@@ -1,0 +1,307 @@
+/**
+ * Custom Popup Styles
+ * Used with custom-popup.js
+ */
+
+/* ============================================
+   OVERLAY
+   ============================================ */
+.product-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   POPUP CONTAINER
+   ============================================ */
+.product-popup {
+  background: #fff;
+  max-width: 850px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 35px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================
+   CLOSE BUTTON
+   ============================================ */
+.popup-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s ease, transform 0.3s ease;
+  line-height: 1;
+  z-index: 10;
+}
+
+.popup-close:hover {
+  color: #000;
+  transform: rotate(90deg);
+}
+
+/* ============================================
+   POPUP CONTENT LAYOUT
+   ============================================ */
+.popup-content {
+  display: flex;
+  gap: 35px;
+  margin-top: 10px;
+}
+
+/* Product Image */
+.popup-product-image {
+  flex: 1;
+  min-width: 0;
+}
+
+.popup-product-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  object-fit: cover;
+  background: #f8f8f8;
+}
+
+/* Product Info */
+.popup-product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popup-product-info h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0 0 5px;
+  color: #1a1a1a;
+}
+
+.popup-product-info #popup-price {
+  font-size: 22px;
+  font-weight: 700;
+  color: #000;
+  margin: 0 0 5px;
+}
+
+.popup-product-info #popup-description {
+  color: #666;
+  line-height: 1.7;
+  font-size: 15px;
+  margin: 5px 0 10px;
+}
+
+/* ============================================
+   VARIANTS
+   ============================================ */
+.popup-variants {
+  margin: 10px 0 5px;
+}
+
+.variant-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.variant-option:last-child {
+  border-bottom: none;
+}
+
+.variant-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #000;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.variant-option input[type="radio"]:disabled {
+  accent-color: #ccc;
+  cursor: not-allowed;
+}
+
+.variant-option label {
+  cursor: pointer;
+  font-size: 15px;
+  color: #333;
+}
+
+.single-variant-info {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0;
+  padding: 8px 0;
+}
+
+/* ============================================
+   ADD TO CART BUTTON
+   ============================================ */
+.popup-add-to-cart {
+  width: 100%;
+  padding: 16px;
+  background: #000;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+}
+
+.popup-add-to-cart:hover:not(:disabled) {
+  background: #1a1a1a;
+  transform: scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.popup-add-to-cart:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ============================================
+   MESSAGE
+   ============================================ */
+.popup-message {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  min-height: 24px;
+}
+
+.popup-message.success {
+  color: #28a745;
+}
+
+.popup-message.error {
+  color: #dc3545;
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+.product-popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.product-popup::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.product-popup::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.product-popup::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .product-popup {
+    padding: 25px 20px;
+    max-height: 95vh;
+  }
+
+  .popup-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .popup-product-image {
+    max-width: 100%;
+  }
+
+  .popup-product-image img {
+    max-height: 250px;
+    object-fit: cover;
+  }
+
+  .popup-product-info h2 {
+    font-size: 20px;
+  }
+
+  .popup-product-info #popup-price {
+    font-size: 18px;
+  }
+
+  .popup-close {
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+  }
+
+  .popup-add-to-cart {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  .variant-option label {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-popup {
+    padding: 20px 15px;
+  }
+  .popup-product-info h2 {
+    font-size: 18px;
+  }
+  .popup-product-info #popup-description {
+    font-size: 13px;
+  }
+}
