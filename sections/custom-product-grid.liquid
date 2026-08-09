@@ -7,6 +7,12 @@
       "id": "heading",
       "label": "Section Heading",
       "default": "Tisso vision in the wild"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
     }
   ],
   "blocks": [
@@ -32,25 +38,35 @@
 }
 {% endschema %}
 
-<div class="custom-product-grid-section">
-  <h2 class="section-heading">{{ section.settings.heading }}</h2>
-  
+<!-- ============================================================
+     CUSTOM PRODUCT GRID SECTION
+     2x3 grid on desktop, 2x1 on mobile
+     Features quickview popup for each product
+     ============================================================ -->
+<section class="custom-product-grid-section">
+  <h2 class="section-heading" style="color: {{ section.settings.heading_color }};">
+    {{ section.settings.heading }}
+  </h2>
+
   <div class="custom-grid-2x3">
     {% for block in section.blocks %}
       {% assign product = block.settings.product %}
-      
+
       {% if product != blank %}
         <div class="custom-grid-item" data-product-id="{{ product.id }}">
-          <img 
-            src="{{ product.featured_image | image_url: width: 600 }}" 
-            loading="lazy" 
+          <!-- Product Image -->
+          <img
+            src="{{ product.featured_image | image_url: width: 600 }}"
+            loading="lazy"
             alt="{{ product.title }}"
             class="grid-item-img"
           >
-          <button 
-            class="quickview-trigger" 
+
+          <!-- Quickview Button Overlay -->
+          <button
+            class="quickview-trigger"
             data-product-id="{{ product.id }}"
-            aria-label="View {{ product.title }}"
+            aria-label="Quick view {{ product.title }}"
             type="button"
           >
             <span class="quickview-icon">👁</span>
@@ -59,33 +75,59 @@
       {% endif %}
     {% endfor %}
   </div>
-</div>
+</section>
 
+<!-- ============================================================
+     STYLES
+     Responsive grid with mobile optimization
+     ============================================================ -->
 <style>
+  /* ============================================================
+     SECTION CONTAINER
+     ============================================================ */
+
   .custom-product-grid-section {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px 20px 80px;
+    padding: 60px 20px;
     background: #fff;
   }
+
+  /* ============================================================
+     HEADING
+     ============================================================ */
+
   .section-heading {
-    font-size: 20px;
+    font-size: 28px;
     font-weight: 600;
-    margin-bottom: 30px;
-    color: #000;
+    margin-bottom: 40px;
+    line-height: 1.2;
   }
+
+  /* ============================================================
+     GRID LAYOUT - Mobile First
+     2 columns on mobile, 3 columns on desktop
+     ============================================================ */
+
   .custom-grid-2x3 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
+
   .custom-grid-item {
     position: relative;
     cursor: pointer;
     aspect-ratio: 4 / 5;
     background: #fafafa;
     overflow: hidden;
+    border-radius: 4px;
   }
+
+  /* ============================================================
+     GRID ITEM IMAGE
+     ============================================================ */
+
   .grid-item-img {
     width: 100%;
     height: 100%;
@@ -93,11 +135,16 @@
     display: block;
     transition: opacity 0.3s ease;
   }
+
   .custom-grid-item:hover .grid-item-img {
     opacity: 0.85;
   }
-  
-  /* QUICKVIEW TRIGGER ICON */
+
+  /* ============================================================
+     QUICKVIEW TRIGGER BUTTON
+     Eye icon that appears on hover
+     ============================================================ */
+
   .quickview-trigger {
     position: absolute;
     top: 50%;
@@ -118,21 +165,68 @@
     padding: 0;
     font-size: 0;
   }
+
+  /* Show button on hover */
   .custom-grid-item:hover .quickview-trigger {
     opacity: 1;
   }
+
   .quickview-trigger:hover {
     background: rgba(0, 0, 0, 0.9);
   }
+
+  /* Eye icon styling */
   .quickview-icon {
     font-size: 24px;
     color: #fff;
   }
 
+  /* ============================================================
+     TABLET & DESKTOP LAYOUT
+     3 columns on desktop (769px and above)
+     ============================================================ */
+
   @media (min-width: 769px) {
     .custom-grid-2x3 {
       grid-template-columns: repeat(3, 1fr);
       gap: 30px;
+    }
+
+    .custom-product-grid-section {
+      padding: 80px 20px;
+    }
+
+    .section-heading {
+      font-size: 32px;
+      margin-bottom: 50px;
+    }
+  }
+
+  /* ============================================================
+     MOBILE OPTIMIZATION
+     ============================================================ */
+
+  @media (max-width: 480px) {
+    .custom-product-grid-section {
+      padding: 40px 15px;
+    }
+
+    .section-heading {
+      font-size: 20px;
+      margin-bottom: 25px;
+    }
+
+    .custom-grid-2x3 {
+      gap: 15px;
+    }
+
+    .quickview-trigger {
+      width: 48px;
+      height: 48px;
+    }
+
+    .quickview-icon {
+      font-size: 20px;
     }
   }
 </style>

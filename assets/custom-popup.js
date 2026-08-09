@@ -1,5 +1,15 @@
+/**
+ * CUSTOM QUICKVIEW POPUP
+ * ======================
+ * Vanilla JavaScript - No jQuery Required
+ * Handles product quickview modal with variant selection and special offers
+ */
+
 document.addEventListener('DOMContentLoaded', function() {
-  // 1. Inject Popup HTML into DOM
+  
+  // ============================================================
+  // 1. INJECT POPUP HTML INTO DOM
+  // ============================================================
   const popupHTML = `
     <div id="quickview-overlay" class="quickview-overlay-custom" style="display:none;">
       <div class="quickview-modal-custom">
@@ -24,7 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
   `;
   document.body.insertAdjacentHTML('beforeend', popupHTML);
 
-  // 2. DOM References
+  // ============================================================
+  // 2. DOM REFERENCES - Cache all selectors
+  // ============================================================
   const overlay = document.getElementById('quickview-overlay');
   const closeBtn = document.querySelector('.quickview-close-custom');
   const addBtn = document.getElementById('qv-add-cart');
@@ -36,12 +48,14 @@ document.addEventListener('DOMContentLoaded', function() {
   const qvDesc = document.getElementById('qv-desc');
   const qvVariants = document.getElementById('qv-variants');
 
+  // State management
   let currentProduct = null;
   let currentVariantId = null;
 
-  // 3. Open Triggers
+  // ============================================================
+  // 3. OPEN POPUP - Event delegation for dynamic buttons
+  // ============================================================
   document.addEventListener('click', function(e) {
-    // Use event delegation to handle dynamically added buttons
     const quickviewBtn = e.target.closest('.quickview-trigger');
     if (quickviewBtn) {
       e.preventDefault();
@@ -51,9 +65,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 4. Fetch Data (Supports both Shopify API calls and a safe test mode)
+  // ============================================================
+  // 4. FETCH PRODUCT DATA
+  // Tries Shopify API first, falls back to mock data for testing
+  // ============================================================
   function fetchProductData(id) {
-    // Attempt to fetch from Shopify API. If it fails (offline testing), use fallback.
     fetch('/products/' + id + '.js')
       .then(res => {
         if (!res.ok) throw new Error('API unavailable');
@@ -64,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         displayPopup(product);
       })
       .catch(() => {
-        // Fallback for preview testing (generates dummy data)
+        // Fallback: Mock data for preview/testing
         console.warn("Using mock data for preview.");
         const mockProduct = {
           id: id,
@@ -83,36 +99,53 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
-  // 5. Render Popup
+  // ============================================================
+  // 5. RENDER POPUP - Populate all product info
+  // ============================================================
   function displayPopup(product) {
+    // Set image and title
     qvImg.src = product.featured_image || '';
     qvImg.alt = product.title;
     qvTitle.textContent = product.title;
+    
+    // Format and display price (Shopify stores price in cents)
     qvPrice.textContent = '$' + (product.price / 100).toFixed(2);
+    
+    // Set description
     qvDesc.textContent = product.description || 'No description available.';
 
+    // ============================================================
+    // RENDER VARIANT OPTIONS
+    // ============================================================
     qvVariants.innerHTML = '';
     if (product.variants && product.variants.length > 1) {
+      // Multiple variants - render as radio options
       product.variants.forEach((variant, i) => {
         const wrap = document.createElement('div');
         wrap.className = 'qv-variant-option';
         
+        // Create radio button
         const radio = document.createElement('input');
         radio.type = 'radio'; 
         radio.name = 'variant'; 
         radio.value = variant.id; 
         radio.id = 'var-' + variant.id;
         
+        // Disable if not available
         if (!variant.available) radio.disabled = true;
+        
+        // Auto-check first available variant
         if (i === 0 && variant.available) { 
           radio.checked = true; 
           currentVariantId = variant.id; 
         }
         
+        // Create label with variant name and price
         const label = document.createElement('label');
         label.htmlFor = 'var-' + variant.id;
         label.textContent = variant.title + ' - $' + (variant.price / 100).toFixed(2);
         
+        // Visual feedback for unavailable variants
         if (!variant.available) { 
           label.style.opacity = '0.5'; 
           label.style.textDecoration = 'line-through'; 
@@ -122,11 +155,13 @@ document.addEventListener('DOMContentLoaded', function() {
         wrap.appendChild(label); 
         qvVariants.appendChild(wrap);
         
+        // Track variant changes
         radio.addEventListener('change', function() {
           if(this.checked) currentVariantId = parseInt(this.value);
         });
       });
     } else if (product.variants && product.variants.length > 0) {
+      // Single variant - display as text
       currentVariantId = product.variants[0].id;
       const single = document.createElement('p');
       single.style.fontSize = '14px'; 
@@ -135,13 +170,18 @@ document.addEventListener('DOMContentLoaded', function() {
       qvVariants.appendChild(single);
     }
 
+    // Clear any previous messages
     msg.textContent = ''; 
     msg.className = 'quickview-msg-custom';
+    
+    // Show overlay
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   }
 
-  // 6. Close Functions
+  // ============================================================
+  // 6. CLOSE POPUP FUNCTIONS
+  // ============================================================
   function closePopup() {
     overlay.style.display = 'none';
     document.body.style.overflow = '';
@@ -151,46 +191,64 @@ document.addEventListener('DOMContentLoaded', function() {
     addBtn.textContent = 'ADD TO CART';
   }
   
+  // Close button click
   closeBtn.addEventListener('click', closePopup);
   
+  // Click outside modal to close
   overlay.addEventListener('click', function(e) { 
     if(e.target === this) closePopup(); 
   });
   
+  // ESC key to close
   document.addEventListener('keydown', function(e) { 
     if(e.key === 'Escape') closePopup(); 
   });
   
+  // Prevent modal click from closing overlay
   document.querySelector('.quickview-modal-custom').addEventListener('click', e => e.stopPropagation());
 
-  // 7. Add to Cart Logic (With the special offer rule)
+  // ============================================================
+  // 7. ADD TO CART LOGIC
+  // SPECIAL RULE: Black + Medium variants auto-add "Soft Winter Jacket"
+  // ============================================================
   addBtn.addEventListener('click', function() {
+    // Get selected variant
     const selected = document.querySelector('input[name="variant"]:checked');
     if(selected) currentVariantId = parseInt(selected.value);
 
+    // Validate selection
     if(!currentVariantId) {
       msg.textContent = 'Please select a variant.'; 
       msg.className = 'quickview-msg-custom error'; 
       return;
     }
 
+    // Show loading state
     addBtn.disabled = true; 
     addBtn.textContent = 'ADDING...';
     msg.textContent = ''; 
     msg.className = 'quickview-msg-custom';
 
-    // Check specifically if "Black + Medium" was selected (using title string)
+    // Find selected variant object
     const selectedVariant = currentProduct.variants.find(v => v.id === currentVariantId);
     
-    // Simulate API call logic
+    // Simulate API delay (800ms)
     setTimeout(() => {
+      // CHECK FOR SPECIAL OFFER: Black + Medium
+      // This triggers auto-add of "Soft Winter Jacket"
       if (selectedVariant && 
           selectedVariant.title.toLowerCase().includes('black') && 
           selectedVariant.title.toLowerCase().includes('medium')) {
         
         msg.textContent = '✓ Added! Adding Soft Winter Jacket too...';
         msg.className = 'quickview-msg-custom success';
-        // In a real Shopify environment, you would add a second fetch('/cart/add.js') here using a static Product ID.
+        
+        // In production Shopify environment:
+        // fetch('/cart/add.js', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ items: [{ id: SOFT_JACKET_VARIANT_ID, quantity: 1 }] })
+        // });
         
       } else {
         msg.textContent = '✓ Added to cart!';
@@ -200,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
       addBtn.disabled = false;
       addBtn.textContent = 'ADD TO CART';
       
+      // Auto-close after 1.5 seconds
       setTimeout(closePopup, 1500);
     }, 800);
   });

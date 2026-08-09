@@ -5,30 +5,118 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title }}</title>
+    
     {% if page_description %}
       <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
 
     {{ content_for_header }}
-    
-    <!-- LOAD YOUR CUSTOM CSS HERE -->
+
+    <!-- ============================================================
+         CUSTOM CSS FILES
+         ============================================================ -->
     {{ 'custom-popup.css' | asset_url | stylesheet_tag }}
-    
-    <!-- BASIC GLOBAL RESET FOR THE TEST -->
+
+    <!-- ============================================================
+         GLOBAL STYLES & RESET
+         ============================================================ -->
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: sans-serif; background: #fff; }
-      .page-wrapper { max-width: 100%; }
+      /* Global Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body Styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #fff;
+        color: #000;
+        line-height: 1.6;
+      }
+
+      /* Page Wrapper */
+      .page-wrapper {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      /* Main Content */
+      main {
+        min-height: 100vh;
+      }
+
+      /* Link Styles */
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* Image Styles */
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Button Reset */
+      button {
+        font-family: inherit;
+      }
+
+      /* ============================================================
+         UTILITY CLASSES
+         ============================================================ */
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
     </style>
   </head>
 
   <body>
-    <!-- YOUR CUSTOM SECTIONS WILL RENDER HERE -->
-    <main id="MainContent" role="main" tabindex="-1">
+    <!-- ============================================================
+         CUSTOM NAVBAR SECTION
+         Sticky navigation with responsive mobile menu
+         ============================================================ -->
+    {% section 'custom-navbar' %}
+
+    <!-- ============================================================
+         MAIN CONTENT AREA
+         All page sections render here
+         ============================================================ -->
+    <main id="MainContent" role="main" tabindex="-1" class="page-wrapper">
       {{ content_for_layout }}
     </main>
 
-    <!-- LOAD YOUR CUSTOM JAVASCRIPT HERE -->
+    <!-- ============================================================
+         CUSTOM JAVASCRIPT FILES
+         Loaded at end of body for performance
+         ============================================================ -->
     {{ 'custom-popup.js' | asset_url | script_tag }}
+
+    <!-- ============================================================
+         FOOTER SECTION (Optional)
+         You can add a custom footer section here
+         ============================================================ -->
+    <!-- {% section 'custom-footer' %} -->
   </body>
 </html>
