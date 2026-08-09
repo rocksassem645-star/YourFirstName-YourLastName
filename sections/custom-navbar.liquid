@@ -1,106 +1,204 @@
-<header class="custom-navbar">
-  <div class="custom-navbar__inner">
+<nav class="custom-navbar">
+  <div class="navbar-container">
 
-    <a href="{{ routes.root_url }}" class="custom-navbar__logo">
-      {{ shop.name }}
+    <a href="{{ routes.root_url }}" class="navbar-logo">
+      <span class="logo-text">{{ shop.name }}</span>
     </a>
 
-    <nav class="custom-navbar__links" aria-label="Main navigation">
-      <a href="{{ routes.root_url }}">Home</a>
-      <a href="{{ routes.all_products_collection_url }}">Shop</a>
-      <a href="/pages/about">About</a>
-      <a href="/pages/contact">Contact</a>
-    </nav>
+    <button
+      class="navbar-toggle"
+      id="navbar-toggle"
+      type="button"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-    <div class="custom-navbar__actions">
-      <a href="{{ routes.search_url }}" aria-label="Search">
-        Search
-      </a>
+    <ul class="navbar-menu" id="navbar-menu">
 
-      <a href="{{ routes.cart_url }}" aria-label="Cart">
-        Cart
-      </a>
-    </div>
+      <li class="navbar-item">
+        <a href="#shop" class="navbar-link">Shop</a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="#about" class="navbar-link">About</a>
+      </li>
+
+      <li class="navbar-item">
+        <a href="#contact" class="navbar-link">Contact</a>
+      </li>
+
+      <li class="navbar-item navbar-cart">
+        <a
+          href="{{ routes.cart_url }}"
+          class="navbar-link"
+          title="Shopping Cart"
+          aria-label="Shopping Cart"
+        >
+          🛒
+        </a>
+      </li>
+
+    </ul>
 
   </div>
-</header>
+</nav>
 
 <style>
   .custom-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     width: 100%;
     background: #fff;
-    border-bottom: 1px solid #eee;
-    position: relative;
-    z-index: 20;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .custom-navbar__inner {
+  .navbar-container {
     max-width: 1200px;
-    min-height: 64px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 20px;
+    height: 70px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 30px;
   }
 
-  .custom-navbar a {
-    color: #111;
+  .navbar-logo {
     text-decoration: none;
+    color: inherit;
   }
 
-  .custom-navbar__logo {
+  .logo-text {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    white-space: nowrap;
+    text-transform: uppercase;
   }
 
-  .custom-navbar__links {
+  .navbar-menu {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 32px;
-    flex: 1;
+    gap: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .custom-navbar__links a,
-  .custom-navbar__actions a {
-    font-size: 13px;
+  .navbar-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .navbar-link {
+    position: relative;
+    color: inherit;
+    text-decoration: none;
+    font-size: 14px;
     font-weight: 500;
   }
 
-  .custom-navbar__links a:hover,
-  .custom-navbar__actions a:hover {
-    opacity: 0.55;
+  .navbar-link:hover {
+    opacity: 0.7;
   }
 
-  .custom-navbar__actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    white-space: nowrap;
+  .navbar-link::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
   }
 
-  @media (max-width: 700px) {
-    .custom-navbar__inner {
-      min-height: 58px;
-      padding: 0 16px;
-      gap: 16px;
+  .navbar-link:hover::after {
+    width: 100%;
+  }
+
+  .navbar-cart .navbar-link::after {
+    display: none;
+  }
+
+  .navbar-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+
+  .navbar-toggle span {
+    width: 25px;
+    height: 3px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .navbar-container {
+      height: 60px;
+      padding: 0 15px;
     }
 
-    .custom-navbar__links {
+    .navbar-toggle {
+      display: flex;
+    }
+
+    .navbar-menu {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      flex-direction: column;
+      gap: 0;
+      background: #fff;
+
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .navbar-menu.active {
+      max-height: 300px;
+    }
+
+    .navbar-item {
+      width: 100%;
+    }
+
+    .navbar-link {
+      display: block;
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      font-size: 16px;
+    }
+
+    .navbar-link::after {
       display: none;
-    }
-
-    .custom-navbar__logo {
-      font-size: 17px;
-    }
-
-    .custom-navbar__actions {
-      gap: 14px;
     }
   }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggle = document.getElementById('navbar-toggle');
+    const menu = document.getElementById('navbar-menu');
+
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', function () {
+      menu.classList.toggle('active');
+
+      const expanded = menu.classList.contains('active');
+      toggle.setAttribute('aria-expanded', expanded);
+    });
+  });
+</script>
