@@ -1,0 +1,138 @@
+{% schema %}
+{
+  "name": "Custom Product Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Tisso vision in the wild"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Select Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Grid",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+
+<div class="custom-product-grid-section">
+  <h2 class="section-heading">{{ section.settings.heading }}</h2>
+  
+  <div class="custom-grid-2x3">
+    {% for block in section.blocks %}
+      {% assign product = block.settings.product %}
+      
+      {% if product != blank %}
+        <div class="custom-grid-item" data-product-id="{{ product.id }}">
+          <img 
+            src="{{ product.featured_image | image_url: width: 600 }}" 
+            loading="lazy" 
+            alt="{{ product.title }}"
+            class="grid-item-img"
+          >
+          <button 
+            class="quickview-trigger" 
+            data-product-id="{{ product.id }}"
+            aria-label="View {{ product.title }}"
+            type="button"
+          >
+            <span class="quickview-icon">👁</span>
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+  .custom-product-grid-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 20px 80px;
+    background: #fff;
+  }
+  .section-heading {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #000;
+  }
+  .custom-grid-2x3 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  .custom-grid-item {
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 4 / 5;
+    background: #fafafa;
+    overflow: hidden;
+  }
+  .grid-item-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: opacity 0.3s ease;
+  }
+  .custom-grid-item:hover .grid-item-img {
+    opacity: 0.85;
+  }
+  
+  /* QUICKVIEW TRIGGER ICON */
+  .quickview-trigger {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 56px;
+    height: 56px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #fff;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, background 0.3s ease;
+    padding: 0;
+    font-size: 0;
+  }
+  .custom-grid-item:hover .quickview-trigger {
+    opacity: 1;
+  }
+  .quickview-trigger:hover {
+    background: rgba(0, 0, 0, 0.9);
+  }
+  .quickview-icon {
+    font-size: 24px;
+    color: #fff;
+  }
+
+  @media (min-width: 769px) {
+    .custom-grid-2x3 {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+  }
+</style>
