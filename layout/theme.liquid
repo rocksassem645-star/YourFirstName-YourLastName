@@ -1,155 +1,122 @@
 <!doctype html>
-<html
-  {% if request.design_mode %}
-    class="shopify-design-mode"
-  {% endif %}
-  lang="{{ request.locale.iso_code }}"
->
+<html lang="{{ request.locale.iso_code }}">
   <head>
-    {%- if settings.favicon != blank -%}
-      <link
-        rel="icon"
-        type="image/png"
-        href="{{ settings.favicon | image_url: width: 32, height: 32 }}"
-      >
-    {%- endif -%}
-
-    {% comment %}
-      Opt into cross-document (MPA) view transitions and hold first paint until #MainContent
-      parses, so the transition runs consistently.
-      Both are gated on the same settings as the view-transitions.js opt-out switch (see snippets/scripts.liquid).
-    {% endcomment %}
-    {% if settings.transition_to_main_product or settings.page_transition_enabled %}
-      {% style %}
-        @media (prefers-reduced-motion: no-preference) {
-          @view-transition {
-            navigation: auto;
-          }
-        }
-      {% endstyle %}
-      <link
-        rel="expect"
-        href="#MainContent"
-        blocking="render"
-        id="view-transition-render-blocker"
-      >
-    {% endif %}
-
-    {%- render 'meta-tags' -%}
-    {%- render 'stylesheets' -%}
-    {%- render 'fonts' -%}
-    {%- render 'scripts' -%}
-    {%- render 'theme-styles-variables' -%}
-    {%- render 'color-palette' -%}
-
-    {% if request.design_mode %}
-      {%- render 'theme-editor' -%}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
     {% endif %}
 
     {{ content_for_header }}
+
+    <!-- ============================================================
+         CUSTOM CSS FILES
+         ============================================================ -->
+    {{ 'custom-popup.css' | asset_url | stylesheet_tag }}
+
+    <!-- ============================================================
+         GLOBAL STYLES & RESET
+         ============================================================ -->
+    <style>
+      /* Global Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* Body Styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background: #fff;
+        color: #000;
+        line-height: 1.6;
+      }
+
+      /* Page Wrapper */
+      .page-wrapper {
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      /* Main Content */
+      main {
+        min-height: 100vh;
+      }
+
+      /* Link Styles */
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* Image Styles */
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Button Reset */
+      button {
+        font-family: inherit;
+      }
+
+      /* ============================================================
+         UTILITY CLASSES
+         ============================================================ */
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
   </head>
 
-  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
-    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+  <body>
+    <!-- ============================================================
+         CUSTOM NAVBAR SECTION
+         Sticky navigation with responsive mobile menu
+         ============================================================ -->
+    {% section 'custom-navbar' %}
 
-    {% render 'chat-drawer' %}
+    <!-- ============================================================
+         MAIN CONTENT AREA
+         All page sections render here
+         ============================================================ -->
+    <main id="MainContent" role="main" tabindex="-1" class="page-wrapper">
+      {{ content_for_layout }}
+    </main>
 
-    <div class="page-wrapper">
-      <div id="header-group">
-        {% sections 'header-group' %}
-      </div>
+    <!-- ============================================================
+         CUSTOM JAVASCRIPT FILES
+         Loaded at end of body for performance
+         ============================================================ -->
+    {{ 'custom-popup.js' | asset_url | script_tag }}
 
-      <script>
-        // Inline header height and menu style calculations to prevent layout shift
-        // Note: Updates in calculateHeaderGroupHeight(), updateTransparentHeaderOffset() and setHeaderMenuStyle() utilities.js should be kept in sync with this function
-        (function setHeaderHeighCustomProperties() {
-          /*
-           * Header calculation functions for maintaining CSS variables
-           * Mimic calculateHeaderGroupHeight() in utilities.js
-           */
-          const header = document.querySelector('header-component');
-          const headerGroup = document.querySelector('#header-group');
-          const hasHeaderSection = headerGroup?.querySelector('.header-section');
-
-          if (!header || !headerGroup) return;
-
-          const headerTopRow = header.querySelector('.header__row--top');
-          const headerHeight = header.offsetHeight;
-
-          // Calculate the total height of the header group
-          let headerGroupHeight = 0;
-          const children = headerGroup.children;
-          for (let i = 0; i < children.length; i++) {
-            const element = children[i];
-            if (element === header || !(element instanceof HTMLElement)) continue;
-            headerGroupHeight += element.offsetHeight;
-          }
-
-          // Check for transparent header special case
-          if (header.hasAttribute('transparent') && header.parentElement?.nextElementSibling) {
-            headerGroupHeight += headerHeight;
-          }
-
-          // Set CSS variables
-          document.body.style.setProperty('--header-height', `${headerHeight}px`);
-          document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
-
-          if (headerTopRow) {
-            window.requestAnimationFrame(function () {
-              document.body.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
-            });
-          }
-
-          /**
-           * Updates CSS custom properties for transparent header offset calculation
-           * Mimic updateTransparentHeaderOffset() in utilities.js
-           */
-
-          if (!hasHeaderSection || !header?.hasAttribute('transparent')) {
-            document.body.style.setProperty('--transparent-header-offset-boolean', '0');
-            return;
-          }
-
-          const hasImmediateSection = hasHeaderSection.nextElementSibling?.classList.contains('shopify-section');
-
-          const shouldApplyOffset = !hasImmediateSection ? '1' : '0';
-          document.body.style.setProperty('--transparent-header-offset-boolean', shouldApplyOffset);
-        })();
-
-        (function setHeaderMenuStyle() {
-          const headerComponent = document.querySelector('#header-component');
-          if (headerComponent) {
-            const isTouchDevice = 'ontouchstart' in window && navigator.maxTouchPoints > 0;
-            const overflowList = headerComponent?.querySelector('overflow-list');
-            const hasReachedMinimum = overflowList && overflowList.hasAttribute('minimum-reached');
-            headerComponent.dataset.menuStyle = isTouchDevice || hasReachedMinimum ? 'drawer' : 'menu';
-          }
-        })();
-      </script>
-
-      <main
-        id="MainContent"
-        class="content-for-layout"
-        role="main"
-        data-page-transition-enabled="{{ settings.page_transition_enabled }}"
-        data-product-transition="{{ settings.transition_to_main_product }}"
-        data-template="{{ template }}"
-      >
-        {{ content_for_layout }}
-      </main>
-
-      <footer>
-        {% sections 'footer-group' %}
-      </footer>
-    </div>
-
-    {% render 'cart-drawer', render_wrapper: true %}
-    {% render 'theme-drawer' %}
-
-    {% render 'search-modal' %}
-
-    {% if settings.quick_add or settings.mobile_quick_add %}
-      {% render 'quick-add-modal' %}
-    {% endif %}
+    <!-- ============================================================
+         FOOTER SECTION (Optional)
+         You can add a custom footer section here
+         ============================================================ -->
+    <!-- {% section 'custom-footer' %} -->
   </body>
 </html>
